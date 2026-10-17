@@ -1,0 +1,164 @@
+---
+title: "Problem Set 2"
+author: "Khalid Khogali"
+date: 10/16/26
+format:
+  html:
+    toc: true
+    embed-resources: true
+---
+
+**GitHub repo:** <https://github.com/KhalidKho/ec422_ps2_Khogali>
+
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+library(knitr)
+
+source("ps2_script_khogali.R")
+```
+
+## Data
+
+These are seasonally adjusted monthly unemployment rates for the
+United States, Oregon, California, Texas, and New York. The data
+come from FRED and are saved locally.
+
+```{r}
+unemp_raw <- read_rds("data/unemp_raw.rds")
+
+knitr::kable(
+  head(unemp_raw),
+  caption = "First six rows of the data"
+)
+```
+
+```{r}
+#| echo: false
+
+cat(
+  "The sample covers",
+  format(min(unemp_raw$date), "%B %Y"),
+  "through",
+  paste0(format(max(unemp_raw$date), "%B %Y"), ".")
+)
+```
+
+## Wrangling
+
+I renamed the rate column and added region names. Following the
+instructions, I replaced October 2025 rates with September's values.
+I also calculated each region's monthly change in percentage points.
+
+### Full sample
+
+Mean, minimum, and maximum unemployment rates for each region:
+
+```{r}
+knitr::kable(
+  unemp_summary,
+  digits = 2,
+  col.names = c("Region", "Mean (%)", "Minimum (%)", "Maximum (%)")
+)
+```
+
+### January 2015 onward
+
+The same statistics for the more recent period:
+
+```{r}
+knitr::kable(
+  unemp_recent_summary,
+  digits = 2,
+  col.names = c("Region", "Mean (%)", "Minimum (%)", "Maximum (%)")
+)
+```
+
+### Largest increases excluding 2020
+
+The five largest monthly increases, including ties. Changes are
+measured in percentage points.
+
+```{r}
+unemp_top_increases_no_covid |>
+  select(region, date, unemployment_rate, unemployment_rate_change) |>
+  knitr::kable(
+    digits = 2,
+    col.names = c("Region", "Month", "Rate (%)", "Change (pp)")
+  )
+```
+
+### Largest decreases excluding 2020
+
+The five largest monthly decreases, including ties. Negative values
+mean unemployment fell.
+
+```{r}
+unemp_top_decreases_no_covid |>
+  select(region, date, unemployment_rate, unemployment_rate_change) |>
+  knitr::kable(
+    digits = 2,
+    col.names = c("Region", "Month", "Rate (%)", "Change (pp)")
+  )
+```
+
+## Visualization
+
+### Unemployment by region
+
+This graph compares all five regions over time.
+
+```{r}
+#| echo: false
+#| fig-width: 9
+#| fig-height: 5
+
+plot_all
+```
+
+### Separate region graphs
+
+Separate panels make each region easier to follow. They use the
+same scale for comparison.
+
+```{r}
+#| echo: false
+#| fig-width: 9
+#| fig-height: 6
+
+plot_facets
+```
+
+### Average unemployment
+
+Regions are ordered from lowest to highest average unemployment
+over the full sample.
+
+```{r}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 5
+
+plot_means
+```
+
+### Oregon and the United States
+
+I chose to compare Oregon with the national rate since 2015 because
+I wanted to see how unemployment here compares with the country overall.
+Using just two lines makes the differences easier to see.
+
+```{r}
+#| echo: false
+#| fig-width: 9
+#| fig-height: 5
+
+plot_oregon_us
+```
+
+## Reflection
+
+I used AI to teach me how to write some code and trouble shoot the code I was writing initially. But making the graphs was simple once I had the data ready. I wasn't sure when to run each block of code. I also had trouble with Git because I hadn't saved my changes before trying to commit them. I learned that saving, committing, and pushing are separate steps. I feel more comfortable using Git now and checking that my work shows up on GitHub.
+---
